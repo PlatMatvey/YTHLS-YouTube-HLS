@@ -1,54 +1,73 @@
 # YouTube to HLS Converter 🎬
 
-Простой и удобный скрипт на Python, который скачивает видео с YouTube и сразу нарезает его на кусочки для стриминга в формате HLS (.m3u8 и .ts файлы). Отлично подойдет, если ты делаешь свой онлайн-кинотеатр или медиасервер.
+A simple Python script that downloads a YouTube video and automatically converts it into an HLS stream (`.m3u8` playlist and `.ts` segments).
 
-## ⚡ Что умеет этот алгоритм:
-1. Обходит блокировки YouTube: качает видео без ошибок 403 Forbidden и DRM.
-2. Наводит порядок: сам создает отдельную папку под каждое видео по его названию.
-3. Защищает от багов: переименовывает файлы в безопасные имена, чтобы Linux и FFmpeg не спотыкались о спецсимволы в названиях.
-4. Экономит место: автоматически удаляет тяжелый исходный MP4-файл после того, как нарезка завершена.
+Perfect for personal media servers, video streaming projects, or learning how HLS works.
 
-## 📁 Структура проекта
-* config.py — настройки путей и папки для сохранения видео.
-* downloader.py — модуль, который отвечает за скачивание с YouTube.
-* converter.py — модуль, который через FFmpeg режет видео на чанки.
-* main.py — главный файл, который запускает весь процесс по очереди.
+## Features
 
-## 🛠 Что нужно установить на Linux перед запуском:
-Для работы скрипту нужны две системные программы (FFmpeg для видео и Node.js для обхода защитных алгоритмов YouTube):
+* Downloads videos from YouTube using `yt-dlp`
+* Creates a separate folder for each video
+* Uses safe filenames to avoid FFmpeg and filesystem issues
+* Converts videos to HLS format (`.m3u8` + `.ts`)
+* Automatically removes the temporary MP4 file after conversion
 
-Bash
+## Project Structure
 
+```text
+core/
+├── config.py      # Project configuration
+├── downloader.py  # YouTube downloader
+└── converter.py   # HLS converter
+
+main.py            # Entry point
+```
+
+## Requirements
+
+Install FFmpeg:
+
+```bash
 sudo apt update
-sudo apt install ffmpeg nodejs -y
+sudo apt install ffmpeg -y
+```
 
-## 🚀 Как запустить проект:
+Create a virtual environment:
 
-1. Создай и активируй виртуальное окружение в папке проекта:
-  
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-Bash
+Install dependencies:
 
-   python3 -m venv venv
-   source venv/bin/activate
-   
+```bash
+pip install -U "yt-dlp[default]" curl-cffi websockets
+```
 
-2. Установи нужные библиотеки:
-  
+## Usage
 
-Bash
+Open `main.py` and set your video URL:
 
-   pip install -U "yt-dlp[default]" curl-cffi websockets
-   
+```python
+video_url = "https://www.youtube.com/watch?v=VIDEO_ID"
+```
 
-3. Открой 
-main.py, вставь свою ссылку на YouTube в переменную video_url и запускай:
-  
+Run the script:
 
-Bash
+```bash
+python3 main.py
+```
 
-   python3 main.py
-   
+## Output
 
-Готово! Результат появится в папке 
-Videos прямо внутри папки проекта.
+After processing, the generated files will be stored in:
+
+```text
+Videos/
+└── Video Title/
+    ├── index.m3u8
+    ├── index0.ts
+    ├── index1.ts
+    └── ...
+```
