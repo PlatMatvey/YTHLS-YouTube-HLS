@@ -1,32 +1,38 @@
 import os
-from downloader import download_video
-from converter import convert_to_hls
+from core.converter import convert_to_hls
+from core.downloader import download_video
 
-def main():
-    # Целевая ссылка на YouTube
-    video_url = 'https://youtube.com'
-    
+
+def main() -> None:
+    """Основной сценарий загрузки и конвертации видео."""
+    # Ваша ссылка на YouTube
+    video_url = "https://youtube.com"
+
     try:
-        # 1. Вызываем функцию скачивания из модуля downloader
+        # Скачиваем видео и получаем путь к рабочей папке.
         downloaded_file, video_folder = download_video(video_url)
-        
-        # Переименовываем файл в простое имя "temp_video.mp4"
-        # Это защищает FFmpeg от падения из-за спецсимволов и пробелов в названии видео
+
+        # Используем простое имя файла, чтобы избежать проблем
+        # со спецсимволами в названиях видео.
         safe_mp4_path = os.path.join(video_folder, "temp_video.mp4")
+
         if os.path.exists(downloaded_file):
             os.rename(downloaded_file, safe_mp4_path)
-        
-        # 2. Вызываем функцию нарезки из модуля converter
-        success = convert_to_hls(input_path=safe_mp4_path, output_dir=video_folder)
-        
-        # 3. Авто-очистка: удаляем временный MP4 файл, если HLS готов
+
+        # Конвертируем MP4 в HLS.
+        success = convert_to_hls(
+            input_path=safe_mp4_path,
+            output_dir=video_folder,
+        )
+
+        # После успешной конвертации удаляем исходный файл.
         if success and os.path.exists(safe_mp4_path):
-            print("-> Очистка: удаляем исходный MP4 файл для экономии места...")
+            print("-> Удаление временного MP4 файла...")
             os.remove(safe_mp4_path)
-            print("-> Исходный MP4 успешно удален. Алгоритм выполнен на 100%!")
-            
-    except Exception as e:
-        print(f"\n[Критическая ошибка в работе алгоритма]: {e}")
+            print("✓ Обработка завершена успешно.")
+
+    except Exception as error:
+        print(f"\n[Критическая ошибка]: {error}")
 
 if __name__ == "__main__":
     main()
