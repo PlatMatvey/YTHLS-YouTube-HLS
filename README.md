@@ -78,15 +78,7 @@ Videos/
     └── ...
 ```
 
-## Technologies
-
-* Python
-* yt-dlp
-* FFmpeg
-* HLS (HTTP Live Streaming)
-
 ## Disclaimer
 
 This project is intended for educational purposes only.
-
 Users are responsible for complying with YouTube's Terms of Service and applicable copyright laws.
