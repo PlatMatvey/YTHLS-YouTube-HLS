@@ -1,52 +1,32 @@
 import os
 import subprocess
-from config import FFMPEG_EXE
+from .config import FFMPEG_EXE
 
-def convert_to_hls(input_path: str, output_dir: str):
-    """
-    Конвертирует видеофайл в HLS-поток.
-
-    Args:
-        input_path: Путь к исходному видеофайлу.
-        output_dir: Папка для сохранения HLS-файлов.
-
-    Returns:
-        True, если конвертация завершилась успешно,
-        иначе False.
-    """
-
+def convert_to_hls(input_path, output_dir):
     if not os.path.exists(input_path):
-        raise FileNotFoundError(
-            f"Файл для конвертации не найден: {input_path}"
-        )
-    output_playlist = os.path.join(output_dir, "index.m3u8")
+        print("Файл не найден.")
+        return False
 
-    # Создаём HLS-поток с кодеками H.264 и AAC
-    # для максимальной совместимости с браузерами.
+    playlist = os.path.join(output_dir, "index.m3u8")
+
     command = [
         FFMPEG_EXE,
-        "-i", input_path,
-        "-c:v", "libx264",
-        "-c:a", "aac",
-        "-strict", "-2",
-        "-hls_time", "10",
-        "-hls_list_size", "0",
-        "-f", "hls",
-        output_playlist,
+        "-i", input_path,           # Входной MP4-файл
+        "-c:v", "libx264",          # Кодек видео H.264
+        "-c:a", "aac",              # Кодек аудио AAC
+        "-hls_time", "10",          # Длина сегмента
+        "-hls_list_size", "0",      # Все сегменты в плейлисте
+        "-f", "hls",                # Формат HLS
+        playlist,
     ]
-    print("\n[Шаг 2/2] Конвертация видео в HLS...")
 
-    # Запускаем FFmpeg и ожидаем завершения процесса.
-    result = subprocess.run(
-        command,
-        capture_output=True,
-        text=True,
-    )
+    print("Начинается конвертация в HLS...")
+    
+    result = subprocess.run(command)
+
     if result.returncode == 0:
-        print("✓ Конвертация завершена успешно.")
-        print(f"✓ Плейлист создан: {output_playlist}")
+        print("Конвертация завершена.")
         return True
 
-    print("✗ Ошибка FFmpeg:")
-    print(result.stderr)
+    print("Ошибка конвертации.")
     return False

@@ -1,38 +1,27 @@
 import os
-from core.converter import convert_to_hls
 from core.downloader import download_video
+from core.converter import convert_to_hls
 
+def main():
+    # Получаем ссылку от пользователя
+    video_url = input("Введите ссылку на YouTube: ").strip()
 
-def main() -> None:
-    """Основной сценарий загрузки и конвертации видео."""
-    # Ваша ссылка на YouTube
-    video_url = "https://youtube.com"
+    print("Скачивание видео...")
+    # Скачиваем видео
+    video_file, video_dir = download_video(video_url)
 
-    try:
-        # Скачиваем видео и получаем путь к рабочей папке.
-        downloaded_file, video_folder = download_video(video_url)
+    if not video_file:
+        print("Не удалось скачать видео.")
+        return
 
-        # Используем простое имя файла, чтобы избежать проблем
-        # со спецсимволами в названиях видео.
-        safe_mp4_path = os.path.join(video_folder, "temp_video.mp4")
+    print(f"Видео сохранено: {video_file}")
+    # Конвертируем в HLS
+    if convert_to_hls(video_file, video_dir):
+        # Удаляем исходный MP4
+        os.remove(video_file)
+        print("MP4 удалён.")
+        print(f"HLS готов: {video_dir}/index.m3u8")
 
-        if os.path.exists(downloaded_file):
-            os.rename(downloaded_file, safe_mp4_path)
-
-        # Конвертируем MP4 в HLS.
-        success = convert_to_hls(
-            input_path=safe_mp4_path,
-            output_dir=video_folder,
-        )
-
-        # После успешной конвертации удаляем исходный файл.
-        if success and os.path.exists(safe_mp4_path):
-            print("-> Удаление временного MP4 файла...")
-            os.remove(safe_mp4_path)
-            print("✓ Обработка завершена успешно.")
-
-    except Exception as error:
-        print(f"\n[Критическая ошибка]: {error}")
 
 if __name__ == "__main__":
     main()
