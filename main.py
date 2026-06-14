@@ -22,6 +22,5 @@ def main():
         print("MP4 удалён.")
         print(f"HLS готов: {video_dir}/index.m3u8")
 
-
 if __name__ == "__main__":
     main()
